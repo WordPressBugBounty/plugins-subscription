@@ -1,0 +1,94 @@
+<?php
+
+namespace SpringDevs\Subscription;
+
+use SpringDevs\Subscription\Frontend\Checkout;
+use SpringDevs\Subscription\Illuminate\AutoRenewal;
+use SpringDevs\Subscription\Illuminate\Block;
+use SpringDevs\Subscription\Illuminate\Cancellation;
+use SpringDevs\Subscription\Illuminate\Cron;
+use SpringDevs\Subscription\Illuminate\Email;
+use SpringDevs\Subscription\Illuminate\Order;
+use SpringDevs\Subscription\Illuminate\Post;
+use SpringDevs\Subscription\Illuminate\Stats;
+use SpringDevs\Subscription\Illuminate\Gateways\Stripe\Stripe;
+use SpringDevs\Subscription\Illuminate\GuestCheckout;
+use SpringDevs\Subscription\Illuminate\RoleManagement;
+use SpringDevs\Subscription\Illuminate\Subscription\Subscription;
+
+/**
+ * Globally Load Scripts.
+ */
+class Illuminate {
+
+	/**
+	 * Initialize the Class.
+	 */
+	public function __construct() {
+		$this->stripe_initialization();
+		$this->paypal_initialization();
+
+		new Subscription();
+		new RoleManagement();
+		new Order();
+		new Cron();
+		new Cancellation();
+		new Stats();
+		new Post();
+		new Block();
+		new Checkout();
+		new GuestCheckout();
+		new AutoRenewal();
+		new Email();
+	}
+
+	/**
+	 * Stripe Initialization.
+	 *
+	 * @return void
+	 */
+	public function stripe_initialization() {
+		if ( function_exists( 'woocommerce_gateway_stripe' ) ) {
+			if ( ! class_exists( 'WC_Payment_Gateway_CC' ) ) {
+				include_once dirname( WC_PLUGIN_FILE ) . '/includes/gateways/class-wc-payment-gateway-cc.php';
+			}
+
+			include_once dirname( WC_STRIPE_MAIN_FILE ) . '/includes/compat/trait-wc-stripe-subscriptions-utilities.php';
+			include_once dirname( WC_STRIPE_MAIN_FILE ) . '/includes/compat/trait-wc-stripe-pre-orders.php';
+			include_once dirname( WC_STRIPE_MAIN_FILE ) . '/includes/compat/trait-wc-stripe-subscriptions.php';
+			include_once dirname( WC_STRIPE_MAIN_FILE ) . '/includes/abstracts/abstract-wc-stripe-payment-gateway.php';
+
+			if ( class_exists( '\WC_Stripe_Payment_Gateway' ) ) {
+				new Stripe();
+			}
+		}
+	}
+
+	/**
+	 * PayPal Gateway Initialization.
+	 *
+	 * @return void
+	 */
+	public function paypal_initialization() {
+		// Forcefully enable PayPal integration if the option is not set.
+		update_option( 'wp_subs_paypal_integration_enabled', 'on' );
+
+		$is_paypal_integration_enabled = 'on' === get_option( 'wp_subs_paypal_integration_enabled', 'off' );
+
+		// Register the PayPal gateway with WooCommerce.
+		if ( $is_paypal_integration_enabled ) {
+			add_filter( 'woocommerce_payment_gateways', [ $this, 'register_paypal_gateway' ] );
+		}
+	}
+
+	/**
+	 * Register our custom PayPal gateway with WooCommerce
+	 *
+	 * @param array $gateways Payment gateways.
+	 * @return array
+	 */
+	public function register_paypal_gateway( $gateways ) {
+		$gateways[] = 'SpringDevs\\Subscription\\Illuminate\\Gateways\\Paypal\\Paypal';
+		return $gateways;
+	}
+}
