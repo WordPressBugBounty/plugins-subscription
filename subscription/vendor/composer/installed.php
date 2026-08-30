@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'converswp/subscription',
-        'pretty_version' => '1.11.1',
-        'version' => '1.11.1.0',
-        'reference' => 'df5d113bc60344c07b50165f78a2357e0354cd29',
+        'pretty_version' => '1.11.2',
+        'version' => '1.11.2.0',
+        'reference' => '8b0d966ea2e0b0d592e53ded31614f2d1aec6501',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'converswp/subscription' => array(
-            'pretty_version' => '1.11.1',
-            'version' => '1.11.1.0',
-            'reference' => 'df5d113bc60344c07b50165f78a2357e0354cd29',
+            'pretty_version' => '1.11.2',
+            'version' => '1.11.2.0',
+            'reference' => '8b0d966ea2e0b0d592e53ded31614f2d1aec6501',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
