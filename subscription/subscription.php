@@ -4,7 +4,7 @@
  * Plugin URI: https://wpsubscription.co/
  * Description: WPSubscription allows WooCommerce to enable recurring payments, subscriptions, and auto-renewals for digital and physical products. Supports Stripe, PayPal, Paddle, and more.
  *
- * Version: 2.4.0
+ * Version: 2.5.0
  *
  * Author: ConversWP
  * Author URI: https://wpsubscription.co/
@@ -36,6 +36,12 @@ use SpringDevs\Subscription\Illuminate\Gateways\Paypal\Paypal_Blocks_Integration
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Global helpers, loaded as early as composer's autoload "files" used to load them.
+// They are not autoload "files" because PHPUnit loads those before its bootstrap
+// can define ABSPATH, and both files exit without it.
+require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/Admin/AdminComponents.php';
+
 /**
  * Sdevs_Subscription class
  *
@@ -49,7 +55,7 @@ final class Sdevs_Subscription {
 	 *
 	 * @var string
 	 */
-	const VERSION = '2.4.0';
+	const VERSION = '2.5.0';
 
 	/**
 	 * Holds various class instances
@@ -291,6 +297,8 @@ final class Sdevs_Subscription {
 	}
 } // Sdevs_Wc_Subscription
 
+// phpcs:disable Universal.Files.SeparateFunctionsFromOO.Mixed -- Bootstrap file: these global functions must live beside the main class so they load before the autoloaded code runs.
+
 // Add Paypal Gateway Blocks.
 if ( ! function_exists( 'subscrpt_register_paypal_block' ) ) {
 	/**
@@ -329,6 +337,8 @@ if ( ! function_exists( 'subscrpt_register_paypal_block' ) ) {
 function sdevs_subscription() {
 	return Sdevs_Subscription::init();
 }
+
+// phpcs:enable Universal.Files.SeparateFunctionsFromOO.Mixed
 
 /**
  *  Kick-off the plugin
